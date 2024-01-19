@@ -2,7 +2,7 @@
 # Wetland landscape metrics and zonal stats
 #=================================================
 
-# 2023-12-11
+# 2024-01-19
 # Niamh Wall & Peter R.
 # P. James and MJ Fortin Labs
 
@@ -11,6 +11,17 @@
 # - This script uses the grids from the south west section of Ontario UTM Grids 1x1 km data set (n polygons ~ 179K)
 # - We combined "Clear Open Water" (code #1) and Turbid Water (code #2)" to produce raster layers merging wetland and water land cover cells
 # - The 1km landscape metrics took about 30 hours to complete using Fortin Lab desktop.
+# - This code is for running on DRAC (cloud-computing)
+
+
+#=====================================
+# Set up time
+#=====================================
+# This is just needed for benchmarking
+start.time <- Sys.time()
+start.time
+
+
 
 
 #===============================
@@ -41,42 +52,46 @@ library(raster) # raster_3.6-3
 
 #setwd("~/PhD/niamh/")
 #setwd("~/niamh_directory/")
+setwd("~/projects/def-mfortin/georod/data/turtle_connect_on/")
 
 #outf11 <- "./output/version2/gis/"
+
+
+#dataf <- "~/projects/def-mfortin/georod/data/turtle_connect_on/" # data folder
 
 # I created this shp in QGIS with some manual manipulations due to slivers produced when instersecting 
 # with UTM 10 km subset
 # 1km grid
 #shpf1 <- "C:/Users/Peter R/Documents/PhD/niamh/output/version2/gis/utm_1_km_grid_southern_subset1.shp"
-shpf1 <- "~/PhD/niamh/output/version2/gis/utm_1_km_grid_southern_subset3.shp" # no slivers
+shpf1 <- "gis/utm_1_km_grid_southern_subset3.shp" # no slivers
 
-shpf2 <- "~/PhD/niamh/data/gis/wetland_2002/_2002WtldExtent.shp"
+shpf2 <- "gis/wetland_2002/_2002WtldExtent.shp"
 
 # This is the OLCC raster which is used a template raster to derive landscape metrics of historic wetlands
-raster1 <- "~/PhD/niamh/data/gis/crop2_OLCC_Vclip_epsg3161.tif"
+raster1 <- "gis/crop2_OLCC_Vclip_epsg3161.tif"
 
 
 # This is used as a template to rasterize vectors
-raster3 <- "~/PhD/niamh/output/version2/gis/wetland_1800_per_lc_10km.tif"
+raster3 <- "gis/wetland_1800_per_lc_10km.tif"
 
 # Output folder
-outf1 <- "~/PhD/niamh/output/version5/gis/"
-outf3 <- "~/PhD/niamh/output/version3/data/"
+outf1 <- "output/version10/data/"
+#outf3 <- "~/turtle_connect_on/output/version10/data/"
 
 
 # Historic wetlands
 raster_files1 <- c(
-"~/PhD/niamh/output/version2/gis/historic_w1800_100m_v2.tif",
-"~/PhD/niamh/output/version2/gis/wetland_1967.tif",
-"~/PhD/niamh/output/version2/gis/wetland_1982.tif",
-"~/PhD/niamh/output/version2/gis/wetland_2002.tif")
+"gis/historic_w1800_100m_v2.tif",
+"gis/wetland_1967.tif",
+"gis/wetland_1982.tif",
+"gis/wetland_2002.tif")
 
 # historic wetalnds augmented with OLCC wetland (has NAs)
 raster_files2<- c(
-"~/PhD/niamh/output/version5/gis/wetland6_1800.tif",
-"~/PhD/niamh/output/version5/gis/wetland6_1967.tif",
-"~/PhD/niamh/output/version5/gis/wetland6_1982.tif",
-"~/PhD/niamh/output/version5/gis/wetland6_2002.tif")
+"gis/wetland6_1800.tif",
+"gis/wetland6_1967.tif",
+"gis/wetland6_1982.tif",
+"gis/wetland6_2002.tif")
 
 
 # These prefix and suffixes are need to create files with the correct labels
@@ -87,6 +102,23 @@ prefix1 <- "utm_grid_1km_"
 #suffix1 <- "_10km"
 #suffix1 <- "_5km"
 suffix1 <- "_1km"
+
+
+
+#========================================
+# Parallel processing settings
+#========================================
+
+# Use the environment variable SLURM_CPUS_PER_TASK to set the number of cores.
+# This is for SLURM. Replace SLURM_CPUS_PER_TASK by the proper variable for your system.
+# Avoid manually setting a number of cores.
+ncores = Sys.getenv("SLURM_CPUS_PER_TASK") 
+
+registerDoParallel(cores=ncores)# Shows the number of Parallel Workers to be used
+print(ncores) # this how many cores are available, and how many you have requested.
+#getDoParWorkers()# you can compare with the number of actual workers
+
+timeSleep <- 3
 
 
 #==================================
@@ -133,11 +165,11 @@ grids1Pj <- st_transform(sf::st_as_sf(g1), crs(r3))
 # water matrix
 #Ok so I think we could just combine "Clear Open Water" (code #1) and Turbid Water (code #2)
 
-m <- c(0, 2, 10, 2, 247, 0)
+# m <- c(0, 2, 10, 2, 247, 0)
 
-rclM2 <- matrix(m, ncol=3, byrow=TRUE)
+# rclM2 <- matrix(m, ncol=3, byrow=TRUE)
 
-r3Rcl2 <- classify(r3, rclM2, include.lowest=FALSE, right=TRUE)
+# r3Rcl2 <- classify(r3, rclM2, include.lowest=FALSE, right=TRUE)
 
 #global(r3Rcl1, fun="isNA")
 #global(r3Rcl2, fun="isNA")
@@ -145,22 +177,22 @@ r3Rcl2 <- classify(r3, rclM2, include.lowest=FALSE, right=TRUE)
 
 #--------------------------------------------------------------------
 # Wetland matrix (augmented OLCC 2009)
-m <- c(0, 4, 0, 4, 8, 1, 8, 247, 0 )
-rclM3 <- matrix(m, ncol=3, byrow=TRUE)
-#
-olcc2 <- classify(r3, rclM3, include.lowest=FALSE, right=TRUE)
+# m <- c(0, 4, 0, 4, 8, 1, 8, 247, 0 )
+# rclM3 <- matrix(m, ncol=3, byrow=TRUE)
+
+# olcc2 <- classify(r3, rclM3, include.lowest=FALSE, right=TRUE)
 
 
 wetValue <- c(500, 600, 700, 800)
 
 # Only historic wetlands
-rwetL10 <- foreach(i=1:nlyr(wetland1)) %do%  {
+# rwetL10 <- foreach(i=1:nlyr(wetland1)) %do%  {
                   
-         temp10 <-  app(c(wetland1[[i]], r3Rcl2), fun="first", na.rm=TRUE) 
+         # temp10 <-  app(c(wetland1[[i]], r3Rcl2), fun="first", na.rm=TRUE) 
          
-         temp20 <- subst(temp10, 10, 1)  # Turn water into other  
+         # temp20 <- subst(temp10, 10, 1)  # Turn water into other  
                           
-                  }
+                  # }
 
 
 #--------------------------------------------------------------------
@@ -174,49 +206,38 @@ rwetL10 <- foreach(i=1:nlyr(wetland1)) %do%  {
                            
 #                  }
 
-rwetL10 <- foreach(i=1:nlyr(wetland1)) %do%  {
+# rwetL10 <- foreach(i=1:nlyr(wetland1)) %do%  {
                   
-         temp1 <-  app(c(wetland1[[i]], olcc2), fun="first", na.rm=TRUE) 
+         # temp1 <-  app(c(wetland1[[i]], olcc2), fun="first", na.rm=TRUE) 
          
-         temp2 <- subst(temp1, 1, wetValue[i])  
+         # temp2 <- subst(temp1, 1, wetValue[i])  
          
-         #temp2 <- subst(temp2, 0, NA)   # I used this to create wetland6 series which have NAs
+         #temp2 <- subst(temp2, 0, NA)   # I used this to create wetland6 series which have NAs. Do not uncomment
                            
-                  }
+                  # }
 
-#dev.new(); plot(rwetL10[[1]], main="1800 Augmented", col="blue")
-#dev.new(); plot(wetland1[[1]], main="1800 Original", col="blue")
 
-#dev.new(); plot(rwetL10[[3]], main="1800 Augmented", col="blue")
-#dev.new(); plot(wetland1[[3]], main="1800 Original", col="blue")
 
 #--------------------------------------------------------------------
 # Augment with water                 
-rwetL10Water <- foreach(i=1:nlyr(wetland2)) %do%  {
+# rwetL10Water <- foreach(i=1:nlyr(wetland2)) %do%  {
                   
-         temp10 <-  app(c(wetland2[[i]], r3Rcl2), fun="first", na.rm=TRUE) 
+         # temp10 <-  app(c(wetland2[[i]], r3Rcl2), fun="first", na.rm=TRUE) 
          
-         temp20 <- subst(temp10, 10, wetValue[i])    
+         # temp20 <- subst(temp10, 10, wetValue[i])    
                         
-                  }
+                  # }
  
- # version 2 using aumented wetland above rwetL10                
-#rwetL10Water <- foreach(i=1:length(rwetL10)) %do%  {
-#                  
-#         temp10 <-  app(c(rwetL10[[i]] , r3Rcl2), fun="first", na.rm=TRUE) 
-#         
-#         temp20 <- subst(temp10, 10, wetValue[i])    
-#                        
-#                  }
 
-
- rwetL40 <- c(rwetL10, rwetL10Water)
+ #rwetL40 <- c(rwetL10, rwetL10Water)
  
  #class( rwetL40)
  
  # Save as raster stack to ease future analysis
  #writeRaster(rast(rwetL40), paste0(outf1, "his_wetland_stack_v6.tif"), overwrite=FALSE)
-# rwetL40 <- rast(paste0(outf1, "his_wetland_stack_v6.tif"))
+ rwetL40 <- rast(paste0("gis/", "his_wetland_stack_v6.tif"))
+ 
+ class( rwetL40)
 
 #global(rwetL40[[3]], fun="notNA")
 #global(rwetL40[[7]], fun="notNA")
@@ -230,7 +251,7 @@ rwetL10Water <- foreach(i=1:nlyr(wetland2)) %do%  {
 
 
 # Layers 1:4 are only wetland. Layers 5:8 are wetland augmented with OLCC water land cover classes 
-landM <- foreach(i=1:length(rwetL40)) %do%
+landM <- foreach(i=1:nlyr(rwetL40)) %do%
                   sample_lsm(raster::raster(rwetL40[[i]]), grids1Pj, plot_id=grids1Pj$"OGF_ID", 
                       what = c("lsm_c_pland", "lsm_c_te", "lsm_l_np", "lsm_l_pd", "lsm_l_ta"))
 
@@ -241,6 +262,7 @@ length(landM)
 # First 4 rasters are augmented with OLCC wetland and last 4 rasters are augmented with OLCC wetland and water
 names(landM) <- c("HISWET_1800","HISWET_1967","HISWET_1982","HISWET_2002","HISWET2_1800","HISWET2_1967","HISWET2_1982", "HISWET2_2002")
 
+Sys.sleep(timeSleep)
 
 saveRDS(landM, paste0(outf1,"landM",suffix1,".rds"))
 
@@ -268,15 +290,15 @@ fieldWet <- rep(c("LC500", "LC600", "LC700", "LC800"), 2)
 # This is used a template to rasterize vectors. Make sure you use the right resolution
 
 # 10 km template
-raster3 <- "~/PhD/niamh/output/version2/gis/wetland_1800_per_lc_10km.tif" 
 r1Template <- rast(raster3)
+#r1Template <- rast(raster3)
 # 5km template
-r1Template<- disagg(r1Template, 2, method="bilinear") #, filename="", ...)
+#r1Template<- disagg(r1Template, 2, method="bilinear") #, filename="", ...)
 # 1km template
 r1Template <- disagg(r1Template, 10, method="bilinear") #, filename="", ...)
 
 # Read 1km landscape metrics df
-landM <- readRDS(paste0(outf1,"landM_1km.rds"))
+#landM <- readRDS(paste0(outf1,"landM_1km.rds"))
 
 
 # Note: always check that raster have been created correctly. raster 5:8 were given me issues for some reason.
@@ -316,9 +338,13 @@ st_write(landMdf2Sp, paste0(outf1, prefix1, outname1[i], "_100x100m_per_lcover_v
 
 # rasterize vector
 
-# rasterize water UTM grid polygons and save as tif. 
+# rasterize UTM grid polygons and save as tif. 
 # You need a raster to serve as template.
 rasterize(vect(landMdf2Sp), r1Template, field=fieldWet[i], background=NA, touches=FALSE, update=FALSE,  cover=FALSE, filename=paste0(outf1, outname1[i], "_per_lc", suffix1,".tif"), overwrite=TRUE) # fun= when pts
 
         }       
 
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+time.taken
