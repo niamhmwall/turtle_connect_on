@@ -51,7 +51,7 @@ library(sqldf)
 #setwd()
 
 # Peter's data path
-fpath <- "~/PhD/niamh/output/version3/gis/"
+#fpath <- "~/PhD/niamh/output/version3/gis/"
 # Niamh's'
 #fpath <- "C:/Users/Niamh/Documents/PhD/niamh/output/version2/gis"
 
@@ -61,11 +61,13 @@ fpath3 <- "~/PhD/niamh/data/genetic_distance/"
 
 # Output folder for rasters
 outf0 <- "~/PhD/niamh/output/version2/gis/"  # For spatial data, 10 km
-outf1 <- "~/PhD/niamh/output/version3/gis/"  # For spatial data, 5 km
-outf2 <- "~/PhD/niamh/output/version3/img/"  # For images, figures
-outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
-outf4 <- "~/PhD/niamh/output/version4/gis/"  # For spatial data, X km, jenks
-outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
+#outf1 <- "~/PhD/niamh/output/version3/gis/"  # For spatial data, 5 km
+#outf2 <- "~/PhD/niamh/output/version3/img/"  # For images, figures
+#outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
+#outf4 <- "~/PhD/niamh/output/version4/gis/"  # For spatial data, X km, jenks
+#outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
+outf1 <- "~/PhD/niamh/output/version5/gis/"  # 
+outf2 <- "~/PhD/niamh/output/version5/data/"  # 
 
 
 # These prefix and suffixes are need to create files with the correct labels
@@ -75,7 +77,10 @@ outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
 
 #suffix2 <- "_10km_jenks1"
 #suffix2 <- "_5km_jenks1"
-suffix2 <- "_1km_jenks1"
+#suffix2 <- "_1km_jenks1"
+
+suffix1 <- "_1km"
+#suffix1 <- "_1km_jenks1"
 
 
 #===============================
@@ -147,14 +152,14 @@ length(genDistL1)
 
 
 #ShPathDf1 <- readRDS( paste0(outf3,"ShPathDf1_5km_jenks1.rds") )
-ShPathDf1 <- readRDS( paste0(outf5,"ShPathDf1_1km_jenks1.rds") )
+ShPathDf1 <- readRDS( paste0(outf2,"ShPathDf1_1km.rds") )
 class(ShPathDf1)
 str(ShPathDf1)
 summary(ShPathDf1)
 
 
 #ShPathLcSumDf1 <- readRDS(paste0(outf3,"ShPathLcSumDf1_5km_jenks1.rds") )
-ShPathLcSumDf1 <- readRDS(paste0(outf5,"ShPathLcSumDf1_1km_jenks1.rds") )
+ShPathLcSumDf1 <- readRDS(paste0(outf2,"ShPathLcSumDf1_1km.rds") )
 class(ShPathLcSumDf1)
 str(ShPathLcSumDf1)
 summary(ShPathLcSumDf1)
@@ -221,7 +226,7 @@ splabels <- c("sptu", "bltu", "sntu")
 
 foreach (i=1:length(splabels)) %do% {
 
-saveRDS(ShPathGenDistL2[[i]], paste0(outf5,"ShPathGenDistL1_", splabels[i], suffix2, ".rds"))
+saveRDS(ShPathGenDistL2[[i]], paste0(outf2,"ShPathGenDistL1_", splabels[i], suffix1, ".rds"))
          
          
          }

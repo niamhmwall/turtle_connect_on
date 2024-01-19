@@ -59,11 +59,15 @@ fpath2 <- "~/PhD/niamh/misc"
 
 # Output folder for rasters
 outf0 <- "~/PhD/niamh/output/version2/gis/"  # For spatial data, 10 km
-outf1 <- "~/PhD/niamh/output/version3/gis/"  # For spatial data, 5 km
-outf2 <- "~/PhD/niamh/output/version3/img/"  # For images, figures
-outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
-outf4 <- "~/PhD/niamh/output/version4/gis/"  # For spatial data, X km, jenks
-outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
+#outf1 <- "~/PhD/niamh/output/version3/gis/"  # For spatial data, 5 km
+#outf2 <- "~/PhD/niamh/output/version3/img/"  # For images, figures
+#outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
+#outf4 <- "~/PhD/niamh/output/version4/gis/"  # For spatial data, X km, jenks
+#outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
+outf1 <- "~/PhD/niamh/output/version6/gis/"  # 
+outf2 <- "~/PhD/niamh/output/version6/data/"  # 
+outf1 <- "~/PhD/niamh/output/version7/gis/"  # 
+outf2 <- "~/PhD/niamh/output/version7/data/"  # 
 
 
 # These prefix and suffixes are need to create files with the correct labels
@@ -77,7 +81,7 @@ suffix1 <- "_1km"
 
 #suffix2 <- "_10km_jenks1"
 #suffix2 <- "_5km_jenks1"
-suffix2 <- "_1km_jenks1"
+#suffix2 <- "_1km_jenks1"
 
 #===================================
 # Read data
@@ -93,6 +97,7 @@ suffix2 <- "_1km_jenks1"
 # 1 km augmented
 rastfiles2 <- list.files(path=outf1, pattern = "wetland.*per_lc_1km.tif$", full.names = TRUE) #
 
+rastfiles2 <- rastfiles2[5:12]
 
 # Create a new raster stack to run gdistance.
 rWet <- rast(rastfiles2)
@@ -105,10 +110,14 @@ nlyr(rWet)
 
 # Skip this part if jenks not need
 
-val1 <- terra::values(rWet[[1]])
+val1 <- terra::values(rWet[[1:4]])  # We used 1800 to 2002 as the reference
+# summary(val1[, 4])
 #length(val1)
 #hist(val1)
-summary(val1)
+#summary(val1)
+#length(as.vector(val1, na.rm=TRUE))
+summary(as.vector(val1))
+val1 <- as.vector(val1)
 
 # Get class interval using Jenks/Fisher-Jenks (i.e., natural breaks)
 # Fisher-Jenks runs faster for n>3000. Note that when n is large a 10% sample is used.
@@ -135,25 +144,30 @@ val1Rcl$brks
 # 10 km
 #val1Rcl$brks
 #[1]  0.01981768 20.92833424 52.62652206 98.97857666
+#[1]   0.00000  18.61901  59.29481 100.00000  # only with rWet[[1]]
+#[1]   0.00000  15.60910  54.26854 100.00000  # with rWet[[1]]
 #m <- c(0, 20.9, 1000, 20.9, 52.6, 100, 52.6, 100, 10)
 
 # 5 km crete breaks manually using  object val1Rcl$brks. 
 #m <- c(0, 20.8, 10, 20.8, 54.8, 100, 54.8, 100, 1000)
 
 # 1 km crete breaks manually using  object val1Rcl$brks.
-m <- c(0, 25.6, 10, 25.6, 63.8, 100, 63.8, 100, 1000) 
+#m <- c(0, 25.6, 10, 25.6, 63.8, 100, 63.8, 100, 1000) 
+m <- c(0, 15.6, 10, 15.6, 54.3, 100, 54.3, 100, 1000) 
 
 rclM1 <- matrix(m, ncol=3, byrow=TRUE)
 
 
 # Reclassify raster, all layers at once
-rWetRcl <- classify(rWet, rclM1, include.lowest=FALSE, right=TRUE)
+rWetRcl <- classify(rWet, rclM1, include.lowest=TRUE, right=TRUE)
 #freq(rWetRcl[[1]])
 freq(rWetRcl)
 
 
 #plot(rWetRcl[[1]])
 #dev.new(); plot(rWetRcl[[4]])
+
+rWet <- rWetRcl
 
 
 #===================================
@@ -208,8 +222,11 @@ as(pts_pjL[[i]][, c(1,3:4)], "Spatial") # convert to SpatialPointsDataFrame)
 #class(rWet)
 #class(rWetRcl)
 
-#cost.All <- raster::stack(rWet)  # Original raster stack (no jenks)
-cost.All <- raster::stack(rWetRcl)  # Jenks reclassified raster stack
+#rWet0 <- rWet
+rWet <- ifel(rWet > 0.01, rWet^2, rWet)
+
+cost.All <- raster::stack(rWet)  # Original raster stack (no jenks)
+#cost.All <- raster::stack(rWetRcl)  # Jenks reclassified raster stack
 
 
 #-------------------------------------
@@ -370,7 +387,7 @@ ShPathDf1 <- do.call("rbind", rbindL10)
 #saveRDS(ShPathDf1, paste0(outf3,"ShPathDf1_5km_jenks1.rds") )
 #saveRDS(ShPathDf1, paste0(outf5,"ShPathDf1_1km_jenks1.rds") )
 
-saveRDS(ShPathDf1,paste0(outf5, "ShPathDf1", suffix2, ".rds")  )
+saveRDS(ShPathDf1,paste0(outf2, "ShPathDf1", suffix1, ".rds")  )
 
 
 

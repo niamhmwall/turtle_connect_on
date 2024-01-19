@@ -60,12 +60,13 @@ fpath2 <- "~/PhD/niamh/misc/"
 
 # Output folder for rasters
 outf0 <- "~/PhD/niamh/output/version2/gis/"  # For spatial data, 10 km
-outf1 <- "~/PhD/niamh/output/version3/gis/"  # For spatial data, 5 km
-outf2 <- "~/PhD/niamh/output/version3/img/"  # For images, figures
-outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
-outf4 <- "~/PhD/niamh/output/version4/gis/"  # For spatial data, X km, jenks
-outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
-
+#outf1 <- "~/PhD/niamh/output/version3/gis/"  # For spatial data, 5 km
+#outf2 <- "~/PhD/niamh/output/version3/img/"  # For images, figures
+#outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
+#outf4 <- "~/PhD/niamh/output/version4/gis/"  # For spatial data, X km, jenks
+#outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
+#outf1 <- "~/PhD/niamh/output/version5/gis/"  # 
+#outf2 <- "~/PhD/niamh/output/version5/data/"  # 
 
 # These prefix and suffixes are need to create files with the correct labels
 #prefix1 <- "utm_grid_10km_"
@@ -74,8 +75,9 @@ outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
 
 #suffix2 <- "_10km_jenks1"
 #suffix2 <- "_5km_jenks1"
-suffix2 <- "_1km_jenks1"
-
+#suffix2 <- "_1km_jenks1"
+suffix1 <- "_1km"
+#suffix1 <- "_1km_jenks1"
 
 #===================================
 # Read data
@@ -180,7 +182,7 @@ ShPathLcSumDf1 <- do.call("rbind", rbindPathlcSum2)
 #saveRDS(ShPathLcSumDf1, paste0(outf3,"ShPathLcSumDf1_5km_jenks1.rds") )
 #saveRDS(ShPathLcSumDf1, paste0(outf5,"ShPathLcSumDf1_1km_jenks1.rds") )
 
-saveRDS(ShPathLcSumDf1, paste0(outf5, "ShPathLcSumDf1", suffix2, ".rds")  )
+saveRDS(ShPathLcSumDf1, paste0(outf2, "ShPathLcSumDf1", suffix1, ".rds")  )
 
 #head(ShPathLcSumDf1)
 
