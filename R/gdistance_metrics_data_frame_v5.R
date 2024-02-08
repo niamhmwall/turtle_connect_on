@@ -58,16 +58,16 @@ fpath2 <- "~/PhD/niamh/misc"
 
 
 # Output folder for rasters
-outf0 <- "~/PhD/niamh/output/version2/gis/"  # For spatial data, 10 km
+#outf0 <- "~/PhD/niamh/output/version2/gis/"  # For spatial data, 10 km
 #outf1 <- "~/PhD/niamh/output/version3/gis/"  # For spatial data, 5 km
 #outf2 <- "~/PhD/niamh/output/version3/img/"  # For images, figures
 #outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
 #outf4 <- "~/PhD/niamh/output/version4/gis/"  # For spatial data, X km, jenks
 #outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
-outf1 <- "~/PhD/niamh/output/version6/gis/"  # 
-outf2 <- "~/PhD/niamh/output/version6/data/"  # 
-outf1 <- "~/PhD/niamh/output/version7/gis/"  # 
-outf2 <- "~/PhD/niamh/output/version7/data/"  # 
+#outf1 <- "~/PhD/niamh/output/version6/gis/"  # 
+#outf2 <- "~/PhD/niamh/output/version6/data/"  # 
+outf1 <- "~/PhD/niamh/output/version8/gis/"  # 
+outf2 <- "~/PhD/niamh/output/version8/data/"  # 
 
 
 # These prefix and suffixes are need to create files with the correct labels
@@ -97,7 +97,7 @@ suffix1 <- "_1km"
 # 1 km augmented
 rastfiles2 <- list.files(path=outf1, pattern = "wetland.*per_lc_1km.tif$", full.names = TRUE) #
 
-rastfiles2 <- rastfiles2[5:12]
+#rastfiles2 <- rastfiles2[5:12]
 
 # Create a new raster stack to run gdistance.
 rWet <- rast(rastfiles2)
@@ -140,6 +140,7 @@ val1Rcl <- classInt::classIntervals(val1, 3, style = "fisher", #rtimes = 3,
 
 #class(val1Rcl)
 val1Rcl$brks
+round(val1Rcl$brks, 1)
 
 # 10 km
 #val1Rcl$brks
@@ -152,8 +153,15 @@ val1Rcl$brks
 #m <- c(0, 20.8, 10, 20.8, 54.8, 100, 54.8, 100, 1000)
 
 # 1 km crete breaks manually using  object val1Rcl$brks.
-#m <- c(0, 25.6, 10, 25.6, 63.8, 100, 63.8, 100, 1000) 
-m <- c(0, 15.6, 10, 15.6, 54.3, 100, 54.3, 100, 1000) 
+#m <- c(0, 25.6, 10, 25.6, 63.8, 100, 63.8, 100, 1000)
+# [1]   0.9803922  21.3884430  57.3714085 100.0000000 # version 8 OLCC augmented  
+#m <- c(0, 15.6, 10, 15.6, 54.3, 100, 54.3, 100, 1000) 
+
+wgts <- c(10, 100, 1000)
+val1Rcl2 <- c(0, round(val1Rcl$brks, 1)[2], round(val1Rcl$brks, 1)[3], 100)
+m <-  c(val1Rcl2[1], val1Rcl2[2], wgts[1], val1Rcl2[2], val1Rcl2[3], wgts[2], val1Rcl2[3], val1Rcl2[4], wgts[3])
+
+#m <- c(0, 21.4, 10, 21.4, 57.4, 100, 57.4, 100, 1000) 
 
 rclM1 <- matrix(m, ncol=3, byrow=TRUE)
 
@@ -161,13 +169,15 @@ rclM1 <- matrix(m, ncol=3, byrow=TRUE)
 # Reclassify raster, all layers at once
 rWetRcl <- classify(rWet, rclM1, include.lowest=TRUE, right=TRUE)
 #freq(rWetRcl[[1]])
-freq(rWetRcl)
+#freq(rWetRcl)
 
 
 #plot(rWetRcl[[1]])
 #dev.new(); plot(rWetRcl[[4]])
 
 rWet <- rWetRcl
+
+# -- END skip 
 
 
 #===================================
@@ -181,7 +191,7 @@ rWet <- rWetRcl
 
 #pts <- sf::st_read(paste0(fpath2, "/Site_samplingloc_Oct20_2023.csv"), options=c("X_POSSIBLE_NAMES=Longitude","Y_POSSIBLE_NAMES=Latitude"), crs=4326)
 
-pts <- sf::st_read(paste0(fpath2, "/sites_5km_v3.csv"), options=c("X_POSSIBLE_NAMES=Longitude","Y_POSSIBLE_NAMES=Latitude"), crs=4326)
+pts <- sf::st_read(paste0(fpath2, "/sites_1km_v3.csv"), options=c("X_POSSIBLE_NAMES=Longitude","Y_POSSIBLE_NAMES=Latitude"), crs=4326)
 
 #plot(st_geometry(pts))
 
@@ -219,13 +229,21 @@ as(pts_pjL[[i]][, c(1,3:4)], "Spatial") # convert to SpatialPointsDataFrame)
 # Calculating Least-Cost Path
 #===============================
 
-#class(rWet)
+#class(rWet[[1]])
 #class(rWetRcl)
+#global(rWet[[1]], fun="isNA")
 
 #rWet0 <- rWet
-rWet <- ifel(rWet > 0.01, rWet^2, rWet)
+# Scale up raster if needed
+#rWet <- ifel(rWet > 0.01, rWet^2, rWet)
+#rWet2 <- ifel(is.na(rWet), 0.1, rWet)
+#rWet2 <- ifel(is.na(rWetRcl), 1, rWetRcl)      # version 9
+#rWet2 <- rWet2^2
+rWet2 <- rWet^2 # version 10
+rWet2 <- ifel(is.na(rWet2), 0.01, rWet2)  # version 10
+#global(rWet2[[1]], fun="isNA")
 
-cost.All <- raster::stack(rWet)  # Original raster stack (no jenks)
+cost.All <- raster::stack(rWet2)  # Original raster stack (no jenks)
 #cost.All <- raster::stack(rWetRcl)  # Jenks reclassified raster stack
 
 
@@ -254,7 +272,9 @@ tr.cost.AllL <- foreach (i=1:nlayers(cost.All)) %do% {
                 
 temp1 <- gdistance::transition(cost.All[[i]], transitionFunction = mean, directions = 8)   
 
-gdistance::geoCorrection(temp1, type = "c", multpl=FALSE, scl=FALSE)             
+gdistance::geoCorrection(temp1, type = "c", multpl=FALSE, scl=FALSE)   
+
+          
                 }
                 
 #tr.cost.AllL <- tr.cost.AllL
@@ -266,13 +286,17 @@ gdistance::geoCorrection(temp1, type = "c", multpl=FALSE, scl=FALSE)
 # Create species specific shortest path objects
 
 #rm(shPathLAll) 
-shPathLAll <- foreach (h=1:length(SpSitesL)) %do% {
-               foreach (k=1:length(tr.cost.AllL)) %do% {
-                foreach (i=1:length(SpSitesL[[h]][,1])) %do% {
-                foreach (j=1:length(SpSitesL[[h]][,1]))  %do% {         
+
+ #'%dopar%' <- foreach::'%dopar%'
+ 
+shPathLAll <- foreach (h=1:length(SpSitesL), .inorder=TRUE, .packages="foreach") %dopar% {
+               foreach (k=1:length(tr.cost.AllL)) %dopar% {
+                foreach (i=1:length(SpSitesL[[h]][,1])) %dopar% {
+                foreach (j=1:length(SpSitesL[[h]][,1])) %dopar% {         
                   
                    try(
                    gdistance::shortestPath(tr.cost.AllL[[k]], origin= SpSitesL[[h]][i,], goal=SpSitesL[[h]][j,], output="SpatialLines")
+                                         
                    )
                                                     
                          }
@@ -285,6 +309,8 @@ shPathLAll <- foreach (h=1:length(SpSitesL)) %do% {
 #length(shPathLAll)    # 3 
 #length(shPathLAll[[1]])   # 8
 # shPathLAll[[1]][[1]][[1]][[7]]
+ saveRDS(shPathLAll, paste0(outf1,"shPathLAll.rds"))
+shPathLAll <- readRDS(paste0(outf1,"shPathLAll.rds"))
 
 
 #----------------------------------
@@ -368,14 +394,6 @@ length(rbindL10)  # 3 species-sites
 #summary(rbindL10[[3]][8] > rbindL10[[3]][7]) # Should get all false
 
  
-#------------------------------------------- 
-# Exploratory plots                                   
-#raster::plot(raster::raster(tr.cost.AllL[[1]]), xlab="x coordinate (m)", ylab="y coordinate (m)", legend.lab="Conductance", main="Wetland 1800")
-#lines(shPathLAll[[1]][[1]][[1]][[4]], col="red", lwd=2 )
-#lines(shPathLAll[[1]][[1]][[1]][[4]], col="black", lwd=2 )  # 5km
-##plot(sites[1:2,], add=TRUE)
-
-
 #===================================================
 # Convert list to data frame
 #rm(ShPathDf1)
@@ -387,7 +405,7 @@ ShPathDf1 <- do.call("rbind", rbindL10)
 #saveRDS(ShPathDf1, paste0(outf3,"ShPathDf1_5km_jenks1.rds") )
 #saveRDS(ShPathDf1, paste0(outf5,"ShPathDf1_1km_jenks1.rds") )
 
-saveRDS(ShPathDf1,paste0(outf2, "ShPathDf1", suffix1, ".rds")  )
+saveRDS(ShPathDf1, paste0(outf2, "ShPathDf1", suffix1, ".rds")  )
 
 
 

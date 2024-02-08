@@ -2,7 +2,7 @@
 # Wetland landscape metrics and zonal stats
 #=================================================
 
-# 2024-01-19
+# 2024-02-03
 # Niamh Wall & Peter R.
 # P. James and MJ Fortin Labs
 
@@ -35,6 +35,8 @@ library(landscapemetrics) # landscapemetrics_1.5.4
 library(plyr)  # plyr_1.8.8
 library(reshape2) # reshape2_1.4.4
 library(raster) # raster_3.6-3
+library(doParallel)
+library(stlplus)
 
 #sessionInfo()
 # R version 4.1.1 (2021-08-10)

@@ -1,0 +1,28 @@
+olcc_class_name,value,new_value,new_class_name
+Clear open water,1,1,Water
+Turbid water,2,1,Water
+Shoreline,3,2,Shoreline
+Mudflats,4,3,Other Natural
+Marsh,5,4,Wetland
+Swamp,6,4,Wetland
+Fen,7,4,Wetland
+Bog,8,4,Wetland
+Heath,10,3,Other Natural
+Sparse Treed,11,5,Forest
+Treed upland,12,5,Forest
+Deciduous Treed,13,5,Forest
+Mixed Treed,14,5,Forest
+Coniferous Treed,15,5,Forest
+Plantations,16,6,Agriculture
+Hedge Rows,17,5,Forest
+Disturbance (forest),18,3,Other Natural
+Open Cliff,19,3,Other Natural
+Alvar,20,3,Other Natural
+Sand Barren and Dune,21,3,Other Natural
+Open Tallgrass Prairie,22,7,Grassland
+Tallgrass Savannah,23,7,Grassland
+Tallgrass Woodland,24,5,Forest
+Sand/Rock Extraction,25,8,Development
+Bedrock,26,2,Other Natural
+Community Infrastructure,27,8,Development
+Agriculture,28,6,Agriculture

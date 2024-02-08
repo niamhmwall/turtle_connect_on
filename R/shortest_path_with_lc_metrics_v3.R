@@ -59,7 +59,7 @@ fpath2 <- "~/PhD/niamh/misc/"
  
 
 # Output folder for rasters
-outf0 <- "~/PhD/niamh/output/version2/gis/"  # For spatial data, 10 km
+#outf0 <- "~/PhD/niamh/output/version2/gis/"  # For spatial data, 10 km
 #outf1 <- "~/PhD/niamh/output/version3/gis/"  # For spatial data, 5 km
 #outf2 <- "~/PhD/niamh/output/version3/img/"  # For images, figures
 #outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
