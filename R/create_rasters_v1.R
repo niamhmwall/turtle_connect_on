@@ -51,10 +51,10 @@ shpf1 <- "~/PhD/niamh/output/version3/gis/utm_grid_1km_wetland_1800_100x100m_per
 
 
 # Output folder
-outf1 <- "~/PhD/niamh/output/version3/gis/"
-outf3 <- "~/PhD/niamh/output/version3/data/"
-outf11 <- "~/PhD/niamh/output/version5/gis/"
-outf33 <- "~/PhD/niamh/output/version5/data/"
+#outf1 <- "~/PhD/niamh/output/version3/gis/"
+#outf3 <- "~/PhD/niamh/output/version3/data/"
+#outf1 <- "~/PhD/niamh/output/version5/gis/"
+#outf2 <- "~/PhD/niamh/output/version5/data/"
 
 
 # Historic & water lanscape metrics (percent land cover)
@@ -137,23 +137,23 @@ dev.new(); plot(rwetL11[[1]], main="Wetland 1800 + background of 0s")
 
 # names for the rasters to be created below
 # wetland2 are water augmented rasters
-outname1 <- c("wetland3_1800", 
-"wetland3_1967",  
-"wetland3_1982",
-"wetland3_2002" 
- )
- 
-outname1 <- c("wetland4_1800", 
-"wetland4_1967",  
-"wetland4_1982",
-"wetland4_2002" 
- )
- 
- outname1 <- c("wetland5_1800", 
-"wetland5_1967",  
-"wetland5_1982",
-"wetland5_2002" 
- )
+#outname1 <- c("wetland3_1800", 
+#"wetland3_1967",  
+#"wetland3_1982",
+#"wetland3_2002" 
+# )
+# 
+#outname1 <- c("wetland4_1800", 
+#"wetland4_1967",  
+#"wetland4_1982",
+#"wetland4_2002" 
+# )
+# 
+# outname1 <- c("wetland5_1800", 
+#"wetland5_1967",  
+#"wetland5_1982",
+#"wetland5_2002" 
+# )
  
   outname1 <- c("wetland6_1800", 
 "wetland6_1967",  
@@ -163,11 +163,11 @@ outname1 <- c("wetland4_1800",
  
  
 foreach (i=1:length(rwetL11))  %do%  {
-terra::writeRaster(rwetL11[[i]], filename=paste0(outf11, outname1[i], "_per_lc", suffix1,".tif"), overwrite=TRUE) }
+terra::writeRaster(rwetL11[[i]], filename=paste0(outf1, outname1[i], "_per_lc", suffix1,".tif"), overwrite=TRUE) }
 
 #--------------------------------
-# Augmente wetland with OLCC
+# Augmented wetland with OLCC, wetland6 series
 foreach (i=1:length(rwetL10))  %do%  {
-terra::writeRaster(rwetL10[[i]], filename=paste0(outf11, outname1[i],".tif"), overwrite=TRUE) }
+terra::writeRaster(rwetL10[[i]], filename=paste0(outf1, outname1[i],".tif"), overwrite=TRUE) }
 
 

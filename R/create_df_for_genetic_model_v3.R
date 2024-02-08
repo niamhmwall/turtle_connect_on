@@ -66,8 +66,8 @@ outf0 <- "~/PhD/niamh/output/version2/gis/"  # For spatial data, 10 km
 #outf3 <- "~/PhD/niamh/output/version3/data/" # For non-spatial data
 #outf4 <- "~/PhD/niamh/output/version4/gis/"  # For spatial data, X km, jenks
 #outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
-outf1 <- "~/PhD/niamh/output/version5/gis/"  # 
-outf2 <- "~/PhD/niamh/output/version5/data/"  # 
+outf1 <- "~/PhD/niamh/output/version10/gis/"  # 
+outf2 <- "~/PhD/niamh/output/version10/data/"  # 
 
 
 # These prefix and suffixes are need to create files with the correct labels
@@ -152,36 +152,47 @@ length(genDistL1)
 
 
 #ShPathDf1 <- readRDS( paste0(outf3,"ShPathDf1_5km_jenks1.rds") )
-ShPathDf1 <- readRDS( paste0(outf2,"ShPathDf1_1km.rds") )
+#ShPathDf1 <- readRDS( paste0(outf2,"ShPathDf1_1km.rds") )
 class(ShPathDf1)
 str(ShPathDf1)
 summary(ShPathDf1)
 
 
 #ShPathLcSumDf1 <- readRDS(paste0(outf3,"ShPathLcSumDf1_5km_jenks1.rds") )
-ShPathLcSumDf1 <- readRDS(paste0(outf2,"ShPathLcSumDf1_1km.rds") )
+#ShPathLcSumDf1 <- readRDS(paste0(outf2,"ShPathLcSumDf1_1km.rds") )
 class(ShPathLcSumDf1)
 str(ShPathLcSumDf1)
 summary(ShPathLcSumDf1)
 
 
-ShPathGenDistL1 <-  foreach (i=1:length(genDistL1)) %do% {
-                               
-                               genDist <- genDistL1[[i]]
-                                
-                             sqldf(paste0("SELECT t1.*, t2.mean, t2.median, t3.fst, t3.joost FROM ShPathDf1 t1 JOIN ShPathLcSumDf1 t2 ON t1.path_id=t2.path_id AND t1.rlyr=t2.rlyr AND t1.sp=t2.sp JOIN genDist t3 ON t1.path_id=t3.path_id AND t1.sp=t3.sp") )
-                                    }
+#ShPathGenDistL1 <-  foreach (i=1:length(genDistL1)) %do% {
+#                               
+#                               genDist <- genDistL1[[i]]
+#                                
+#                             sqldf(paste0("SELECT t1.*, t2.mean, t2.median, t3.fst, t3.joost FROM ShPathDf1 t1 JOIN ShPathLcSumDf1 t2 ON t1.path_id=t2.path_id AND t1.rlyr=t2.rlyr AND t1.sp=t2.sp JOIN genDist t3 ON t1.path_id=t3.path_id AND t1.sp=t3.sp") )
+#                                    }
 
  
-class(ShPathGenDistL1)
-str(ShPathGenDistL1)  # 3 species
-#summary(ShPathGenDistL1[[3]])  
-
-dim(ShPathGenDistL1[[3]]) # sptu: [1] 800   14 ; bltu: [2] 968   14; sntu:  [1] 1352 14
+#class(ShPathGenDistL1)
+#str(ShPathGenDistL1)  # 3 species
+##summary(ShPathGenDistL1[[3]])  
+#
+#dim(ShPathGenDistL1[[3]]) # sptu: [1] 800   14 ; bltu: [2] 968   14; sntu:  [1] 1352 14
 #head(ShPathGenDistL1[[1]])
 #tail(ShPathGenDistL1[[1]])
 
 
+# With cost distances
+
+ShPathGenDistL10 <-  foreach (i=1:length(genDistL1)) %do% {
+                               
+                               genDist <- genDistL1[[i]]
+                                
+                             sqldf(paste0("SELECT t1.*, t2.mean, t2.median, t3.fst, t3.joost, t4.cost_dis, t5.cumm_dis FROM ShPathDf1 t1 JOIN ShPathLcSumDf1 t2 ON t1.path_id=t2.path_id AND t1.rlyr=t2.rlyr AND t1.sp=t2.sp JOIN genDist t3 ON t1.path_id=t3.path_id AND t1.sp=t3.sp JOIN costDistDf1 t4 ON t1.path_id=t4.path_id AND t1.rlyr=t4.rlyr AND t1.sp=t4.sp JOIN cummDistDf1 t5 ON t1.path_id=t5.path_id AND t1.rlyr=t5.rlyr AND t1.sp=t5.sp") )
+                                    }
+
+ dim(ShPathGenDistL10[[3]]) # sptu: [1] 800   14 ; bltu: [2] 968   14; sntu:  [1] 1352 14
+ head(ShPathGenDistL10[[2]])
 
 #---------------------------------------------------
 # Create a list to ease model processing/creation
@@ -189,33 +200,37 @@ dim(ShPathGenDistL1[[3]]) # sptu: [1] 800   14 ; bltu: [2] 968   14; sntu:  [1] 
 rlabels <- c("wetland_1800", "wetland_1967", "wetland_1982", "wetland_2002","wetland2_1800","wetland2_1967","wetland2_1982","wetland2_2002")
 
 
-ShPathGenDistL2 <- foreach (i=1:length(ShPathGenDistL1)) %do% {
+#ShPathGenDistL2 <- foreach (i=1:length(ShPathGenDistL1)) %do% {
+#                        
+#                        foreach (j=1:length(rlabels)) %do% {
+#         
+#                                ShPathGenDistL1[[i]][ShPathGenDistL1[[i]]$rlyrlab==rlabels[j], ]
+#         
+#                                              }
+#         }
+# 
+#
+
+
+#---------------------------------------------
+# with cost & cumm distances
+
+#rm(ShPathGenDistL20)
+
+ShPathGenDistL20 <- foreach (i=1:length(ShPathGenDistL10)) %do% {
                         
                         foreach (j=1:length(rlabels)) %do% {
          
-                                ShPathGenDistL1[[i]][ShPathGenDistL1[[i]]$rlyrlab==rlabels[j], ]
+                                ShPathGenDistL10[[i]][ShPathGenDistL10[[i]]$rlyrlab==rlabels[j], ]
          
                                               }
          
          }
+
+saveRDS(ShPathGenDistL20, paste0(outf2,"ShPathGenDistL20", suffix1, ".rds") )
+#ShPathGenDistL20 <-  readRDS(paste0(outf2,"ShPathGenDistL20", suffix1, ".rds") )
+
  
-
-length(ShPathGenDistL2) #8
-#class(ShPathGenDistL2[[1]]) 
-#length(ShPathGenDistL2[[1]]) 
-#class(ShPathGenDistL2[[1]][[1]])
-#dim(ShPathGenDistL2[[1]][[1]])
-#dim(ShPathGenDistL2[[2]][[1]])
-#dim(ShPathGenDistL2[[3]][[1]])
-#
-#
-#head(ShPathGenDistL2[[1]][[1]])
-#head(ShPathGenDistL2[[1]][[2]])
-#head(ShPathGenDistL2[[1]][[3]])
-#head(ShPathGenDistL2[[1]][[4]])
-#head(ShPathGenDistL2[[1]][[8]])
-
-
 
 #=================================================
 # Save R objects
@@ -226,7 +241,7 @@ splabels <- c("sptu", "bltu", "sntu")
 
 foreach (i=1:length(splabels)) %do% {
 
-saveRDS(ShPathGenDistL2[[i]], paste0(outf2,"ShPathGenDistL1_", splabels[i], suffix1, ".rds"))
+saveRDS(ShPathGenDistL20[[i]], paste0(outf2,"ShPathGenDistL20_", splabels[i], suffix1, ".rds"))
          
          
          }
@@ -235,5 +250,14 @@ saveRDS(ShPathGenDistL2[[i]], paste0(outf2,"ShPathGenDistL1_", splabels[i], suff
 #saveRDS(ShPathGenDistL2[[2]], paste0(outf3,"ShPathGenDistL1_bltu_5km_jenks_v1.rds"))
 #saveRDS(ShPathGenDistL2[[3]], paste0(outf3,"ShPathGenDistL1_sntu_5km_jenks_v1.rds"))
 
+# These objects have the buffer euclidean path OLCC metrics (percent lc)
+splabels <- c("sptu", "bltu", "sntu")
+#reslabel <- "_5km" # change here  to _10km, _5km, or _1km as needed
 
+foreach (i=1:length(splabels)) %do% {
+
+saveRDS(ShPathGenDistL50[[i]], paste0(outf2,"ShPathGenDistL50_", splabels[i], suffix1, ".rds"))
+         
+         
+         }
 
