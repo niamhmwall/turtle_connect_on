@@ -182,6 +182,11 @@ rclM1 <- (as.matrix(rclFile[,2:3]))
 #global(r3Rcl2, fun="isNA")
 
  rwetL40 <- r3Rcl1 
+ 
+#write reclassified raster
+#writeRaster(r3Rcl1, paste0(outf1, "olcc_reclass_v1.tif"), overwrite=FALSE) 
+ 
+ 
 #--------------------------------------------------------------------
 # Wetland matrix (augmented OLCC 2009)
 # m <- c(0, 4, 0, 4, 8, 1, 8, 247, 0 )

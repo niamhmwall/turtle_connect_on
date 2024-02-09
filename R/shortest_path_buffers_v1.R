@@ -132,7 +132,9 @@ query1 <- "tur_shpath_buffers_1km_v1"
 bufferShPath <- st_read(con1, query1)
 str(bufferShPath)
 
-terra::writeVector(vect(bufferShPath), "tur_shpath_1km_buffer_v1.shp", filetype = "ESRI Shapefile", overwrite=TRUE)
+
+terra::writeVector(vect(bufferShPath), "/tur_shpath_1km_buffer_v1.shp", filetype = "ESRI Shapefile", overwrite=TRUE)
+
 
 g1 <- terra::vect(bufferShPath)
 
