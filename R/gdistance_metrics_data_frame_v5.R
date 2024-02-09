@@ -66,8 +66,8 @@ fpath2 <- "~/PhD/niamh/misc"
 #outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
 #outf1 <- "~/PhD/niamh/output/version6/gis/"  # 
 #outf2 <- "~/PhD/niamh/output/version6/data/"  # 
-outf1 <- "~/PhD/niamh/output/version8/gis/"  # 
-outf2 <- "~/PhD/niamh/output/version8/data/"  # 
+outf1 <- "~/PhD/niamh/output/version10/gis/"  # 
+outf2 <- "~/PhD/niamh/output/version10/data/"  # 
 
 
 # These prefix and suffixes are need to create files with the correct labels
@@ -289,10 +289,10 @@ gdistance::geoCorrection(temp1, type = "c", multpl=FALSE, scl=FALSE)
 
  #'%dopar%' <- foreach::'%dopar%'
  
-shPathLAll <- foreach (h=1:length(SpSitesL), .inorder=TRUE, .packages="foreach") %dopar% {
-               foreach (k=1:length(tr.cost.AllL)) %dopar% {
-                foreach (i=1:length(SpSitesL[[h]][,1])) %dopar% {
-                foreach (j=1:length(SpSitesL[[h]][,1])) %dopar% {         
+shPathLAll <- foreach (h=1:length(SpSitesL), .inorder=TRUE, .packages="foreach") %do% {
+               foreach (k=1:length(tr.cost.AllL)) %do% {
+                foreach (i=1:length(SpSitesL[[h]][,1])) %do% {
+                foreach (j=1:length(SpSitesL[[h]][,1])) %do% {         
                   
                    try(
                    gdistance::shortestPath(tr.cost.AllL[[k]], origin= SpSitesL[[h]][i,], goal=SpSitesL[[h]][j,], output="SpatialLines")
