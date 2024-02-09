@@ -38,6 +38,9 @@ library(raster) # raster_3.6-3
 library(doParallel)
 library(stlplus)
 
+library(doParallel)
+library(stlplus)
+
 #sessionInfo()
 # R version 4.1.1 (2021-08-10)
 
@@ -253,7 +256,7 @@ wetValue <- c(500, 600, 700, 800)
 
 
 # Layers 1:4 are only wetland. Layers 5:8 are wetland augmented with OLCC water land cover classes 
-landM <- foreach(i=1:nlyr(rwetL40)) %do%
+landM <- foreach(i=1:nlyr(rwetL40), .inorder=TRUE) %dopar%
                   sample_lsm(raster::raster(rwetL40[[i]]), grids1Pj, plot_id=grids1Pj$"OGF_ID", 
                       what = c("lsm_c_pland", "lsm_c_te", "lsm_l_np", "lsm_l_pd", "lsm_l_ta"))
 
