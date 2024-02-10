@@ -140,8 +140,9 @@ rwetL40 <- r3
 #landM <- foreach(i=1:nlyr(rwetL40), .inorder=TRUE, .packages = "foreach") %do%
 #                  sample_lsm(raster::raster(rwetL40[[i]]), grids1Pj, plot_id=grids1Pj$"path_id", 
 #                      what = c("lsm_c_pland", "lsm_c_te", "lsm_l_np", "lsm_l_pd", "lsm_l_ta"))
-                      
-landM <- foreach(i=1:nlyr(rwetL40), .inorder=TRUE, .packages = "foreach") %dopar%
+
+# Given that there is only1 raster to process. %dpar% does not help here                      
+landM <- foreach(i=1:nlyr(rwetL40), .inorder=TRUE, .packages = "foreach") %do%
                   sample_lsm(raster::raster(rwetL40[[i]]), grids1Pj, plot_id=grids1Pj$"rid", 
                       what = c("lsm_c_pland"))
 
