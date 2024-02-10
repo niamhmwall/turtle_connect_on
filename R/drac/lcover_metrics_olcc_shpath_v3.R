@@ -192,7 +192,7 @@ landMdf3 <- merge(st_drop_geometry(grids1Pj[,1:3]), landMdf2, by = "path_id")
 saveRDS(landMdf3, paste0(outf1,prefix1, suffix1,"_landMdf3",".rds"))
 
 # create csv
-write.csv(landMdf3, paste0(outf1, prefix1, suffix1, "olcc", "_v1.csv"), row.names=FALSE)
+write.csv(landMdf3, paste0(outf1, prefix1, suffix1, "_olcc", "_v1.csv"), row.names=FALSE)
 
 
         }       

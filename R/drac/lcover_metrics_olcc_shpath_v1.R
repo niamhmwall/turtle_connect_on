@@ -111,8 +111,8 @@ timeSleep <- 3
 g1 <- terra::vect(shpf1)
 grids1 <- sf::st_read(shpf1)
 
-g1 <- g1[g1$rlyr==4,]
-grids1 <- grids1[grids1$rlyr==4,]
+g1 <- g1[g1$rlyr %in% c(4,8),]
+grids1 <- grids1[grids1$rlyr %in% c(4,8),]
 
 
 r3 <- terra::rast(raster1) # This is the fixed OLCC cropped raster. This is needed to derived metrics below. This raster is used as a template.
@@ -157,7 +157,14 @@ saveRDS(landM, paste0(outf1,prefix1, suffix1,"_landM", ".rds"))
 # Create CSV and raster from landscape metrics
 #=============================================
 
-# Note: always check that raster have been created correctly. raster 5:8 were given me issues for some reason.
+# names for the rasters to be created below
+# wetland2 are wetland+water augmented rasters
+
+outname1 <- c("wetland_1800", 
+              "wetland2_2002" )
+
+
+
 foreach(i=1:length(landM)) %do% {
 
 
@@ -189,10 +196,10 @@ landMdf2$"path_id" <- landMdf2$plot_id
 
 landMdf3 <- merge(st_drop_geometry(grids1Pj[,1:3]), landMdf2, by = "path_id")
 
-saveRDS(landMdf3, paste0(outf1,prefix1, suffix1,"_landMdf3",".rds"))
+saveRDS(landMdf3, paste0(outf1,prefix1, suffix1,outname1[i], "_landMdf3",".rds"))
 
 # create csv
-write.csv(landMdf3, paste0(outf1, prefix1, suffix1, "olcc", "_v1.csv"), row.names=FALSE)
+write.csv(landMdf3, paste0(outf1, prefix1, suffix1, "olcc", outname1[i], "_v1.csv"), row.names=FALSE)
 
 
         }       
