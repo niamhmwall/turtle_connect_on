@@ -142,7 +142,7 @@ rwetL40 <- r3
 #                      what = c("lsm_c_pland", "lsm_c_te", "lsm_l_np", "lsm_l_pd", "lsm_l_ta"))
                       
 landM <- foreach(i=1:nlyr(rwetL40), .inorder=TRUE, .packages = "foreach") %dopar%
-                  sample_lsm(raster::raster(rwetL40[[i]]), grids1Pj, plot_id=grids1Pj$"path_id", 
+                  sample_lsm(raster::raster(rwetL40[[i]]), grids1Pj, plot_id=grids1Pj$"rid", 
                       what = c("lsm_c_pland"))
 
 #length(landM)
@@ -160,8 +160,7 @@ saveRDS(landM, paste0(outf1,prefix1, suffix1,"_landM", ".rds"))
 # names for the rasters to be created below
 # wetland2 are wetland+water augmented rasters
 
-outname1 <- c("wetland_1800", 
-              "wetland2_2002" )
+outname1 <- c("olcc" )
 
 
 
@@ -188,18 +187,18 @@ landMdf2 <- dcast(landMdf2, plot_id  ~ lc_class, value.var="value")
 
 # create a new variable with the same name of the shp unique ID
 # landMdf2$"OGF_ID" <- landMdf2$plot_id # create new field
-landMdf2$"path_id" <- landMdf2$plot_id
+landMdf2$"rid" <- landMdf2$plot_id
 
 
 #Merge spatial grids with landscape metrics. There should be 1960 rows as our grid shp has 1960 grids.
 #landMdf2Sp <- merge(grids1Pj, landMdf2, by = "OGF_ID")
 
-landMdf3 <- merge(st_drop_geometry(grids1Pj[,1:3]), landMdf2, by = "path_id")
+landMdf3 <- merge(st_drop_geometry(grids1Pj[,1:3]), landMdf2, by = "rid")
 
 saveRDS(landMdf3, paste0(outf1,prefix1, suffix1,outname1[i], "_landMdf3",".rds"))
 
 # create csv
-write.csv(landMdf3, paste0(outf1, prefix1, suffix1, "olcc", outname1[i], "_v1.csv"), row.names=FALSE)
+write.csv(landMdf3, paste0(outf1, prefix1, suffix1, outname1[i], "_v1.csv"), row.names=FALSE)
 
 
         }       

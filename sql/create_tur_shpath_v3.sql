@@ -29,4 +29,19 @@ CREATE INDEX IF NOT EXISTS tur_shpath_v3_geom_idx
 	
 INSERT INTO public.tur_shpath_v3
 SELECT * FROM public.tur_shpath_v2
+
+
+-- DROP VIEW public.tur_shpath_buffers_1km_v1;
+
+CREATE OR REPLACE VIEW public.tur_shpath_buffers_1km_v1
+ AS
+ SELECT DISTINCT a.rlyr||'-'|| a.path_id as rid , a.rlyr,
+    a.path_id,
+    st_transform(st_buffer(st_transform(a.geom, 3161), 1000::double precision), 4326) AS geom
+   FROM tur_shpath_v3 a;
+
+ALTER TABLE public.tur_shpath_buffers_1km_v1
+    OWNER TO postgres;
+	
+	select distinct rid from tur_shpath_buffers_1km_v1;
 	
