@@ -126,6 +126,8 @@ suffix1 <- "_1km"
 
 rlabels <- c("wetland_1800", "wetland_1967", "wetland_1982", "wetland_2002","wetland2_1800","wetland2_1967","wetland2_1982","wetland2_2002")
 
+#rlabels <- c("landr")
+
 
 # Summary metrics of raster cell values transversed by leastCostPath.
 

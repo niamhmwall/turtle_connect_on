@@ -171,3 +171,28 @@ foreach (i=1:length(rwetL10))  %do%  {
 terra::writeRaster(rwetL10[[i]], filename=paste0(outf1, outname1[i],".tif"), overwrite=TRUE) }
 
 
+# Create land raster for Null shortestpath
+shp1 <- "C:/Users/Peter R/Documents/PhD/niamh/output/version5/gis/land_study_area_clip1_buff_100m_v1.shp"
+rfile1 <- "C:/Users/Peter R/Documents/PhD/niamh/output/version5/gis/background_per_lc_1km.tif"
+
+r1 <- rast(rfile1)
+plot(r1, col="red")
+v1 <- vect(shp1)
+
+landr1 <- terra::rasterize(v1, r1, "fid")
+plot(landr1, col="green")
+landr1 <- landr1*100
+
+fpath <- "~/PhD/niamh/output/"
+fpath2 <- "~/PhD/niamh/misc"
+
+# Output folder for rasters
+outf1 <- "~/PhD/niamh/output/version5/gis/"  # 
+
+
+foreach (i=1:length(landr1))  %do%  {
+terra::writeRaster(landr1[[i]], filename=paste0(outf1, "landr_v1",".tif"), overwrite=TRUE)
+ }
+ 
+ 
+ 

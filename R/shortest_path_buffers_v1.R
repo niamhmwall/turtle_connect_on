@@ -108,6 +108,10 @@ class(ShPathSpDf11)
 
 terra::writeVector(ShPathSpDf11, paste0("tur_shpath_v1.shp"), filetype = "ESRI Shapefile", overwrite=TRUE)
 
+# Shorted path buffer of wetland raster with a single value - 50% and NAs as 0.01
+#terra::writeVector(ShPathSpDf11, "C:/Users/Peter R/Documents/PhD/niamh/output/version10/gis/tur_shpath_single_value_v1.shp", filetype = "ESRI Shapefile", overwrite=TRUE)
+
+
 
  #===========================
 # Read object from PG
