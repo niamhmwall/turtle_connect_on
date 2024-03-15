@@ -59,8 +59,8 @@ cummDistLAll <- foreach (h=1:length(SpSitesL)) %do% {
          }
  
 class(cummDistLAll)        
-cummDistLAll[[1]][[8]]
-cummDistLAll[[3]][[8]]
+#cummDistLAll[[1]][[8]]
+#cummDistLAll[[3]][[8]]
 #hist(cummDistLAll[[3]][[8]][,3])
 #summary(cummDistLAll[[3]][[8]][,3])
 #
