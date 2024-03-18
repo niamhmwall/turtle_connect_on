@@ -28,11 +28,26 @@ library(foreach)
 library(sqldf)
 
 
+
+
 #=================================
 # Set folder & files paths
 #=================================
 
+setwd("~/PhD/niamh/")
+
 fpath3 <- "~/PhD/niamh/data/genetic_distance/"
+
+# Output folder
+outf1 <- "output/version10/data/"
+outf2 <- "output/version10/gis/"
+
+
+# These prefix and suffixes are need to create files with the correct labels
+
+prefix1 <- "spath_buffer_"
+
+suffix1 <- "1km"
 
 
 # Read objects created in previous runs of the R code 
@@ -41,6 +56,7 @@ ShPathLcSumDf1 <- readRDS("C:/Users/Peter R/Documents/PhD/niamh/output/version10
 costDistDf1 <- readRDS("C:/Users/Peter R/Documents/PhD/niamh/output/version10/data/costDistDf1_1km.rds")
 cummDistDf1 <- readRDS("C:/Users/Peter R/Documents/PhD/niamh/output/version10/data/cummDistDf1_1km.rds")
 
+elevDf <- readRDS(paste0(outf1, "elevDf_", suffix1, ".rds") )
 
 #--------------------------------------------------------------
 # THis is a hack as I did not save the Euclidean buffer object
@@ -57,15 +73,24 @@ class(euPathDf1_bltu)
 head(euPathDf1_bltu[[1]])
 
 # Percent land cover for raster 4 & 8 only. (For some reason it was taking a long time to do all lyrs on DRAC.)
-shPathBuffPerLc <- readRDS(paste0(outf1,prefix1, suffix1,"olcc", "_landMdf3",".rds"))
+shPathBuffPerLc <- readRDS(paste0(outf2,prefix1, suffix1,"olcc", "_landMdf3",".rds"))
+
 #class(shPathBuffPerLc)
 #dim(shPathBuffPerLc)
 #head(shPathBuffPerLc)
 
-elevDf <- readRDS(paste0(outf2, "elevDf_", suffix1, ".rds") )
+
 
 # Back engineer Euclidean path buffers
 
+        
+euPart1 <- foreach (1:length(euPathDf1_sptu), .inorder=TRUE, .packages = "foreach") %do% {
+     
+                      temp1 <- euPathDf1_sptu[[i]]
+                      temp2 <- temp1[, c(1:2, 9:10, 17:24)] 
+         
+         }
+         
 euPart1 <- foreach (1:length(euPathDf1_bltu), .inorder=TRUE, .packages = "foreach") %do% {
      
                       temp1 <- euPathDf1_bltu[[i]]
@@ -73,6 +98,7 @@ euPart1 <- foreach (1:length(euPathDf1_bltu), .inorder=TRUE, .packages = "foreac
          
          }
          
+
 euPart1 <- foreach (1:length(euPathDf1_sntu), .inorder=TRUE, .packages = "foreach") %do% {
      
                       temp1 <- euPathDf1_sntu[[i]]
@@ -80,12 +106,6 @@ euPart1 <- foreach (1:length(euPathDf1_sntu), .inorder=TRUE, .packages = "foreac
          
          }
          
-euPart1 <- foreach (1:length(euPathDf1_sptu), .inorder=TRUE, .packages = "foreach") %do% {
-     
-                      temp1 <- euPathDf1_sptu[[i]]
-                      temp2 <- temp1[, c(1:2, 9:10, 17:24)] 
-         
-         }
 
 # sptu: [1] 800   14 ; bltu: [2] 968   14; sntu:  [1] 1352 14
 
@@ -114,7 +134,9 @@ head(euPartDf4)
 head(euPartDf4[euPartDf4$path_id=='LH1toLE1', ])
 head(euPartDf4[euPartDf4$path_id=='LE1toLH1', ])
 
-saveRDS(euPartDf4, paste0(outf2, "ShPathGenDistL500_", suffix1, ".rds") )
+saveRDS(euPartDf4, paste0(outf1, "euPartDf4_", suffix1, ".rds") )
+
+#euPartDf4 <- readRDS(paste0(outf1, "euPartDf4", suffix1, ".rds") )
 
 # Hack ends here!
 #------------------------------------------------
@@ -186,8 +208,8 @@ genDistL1 <- foreach (i=1:length(fstL1)) %do% {
 
 
 # Add Euclidean and shortest path buffer metrics and elevation
-
-ShPathGenDistL500 <- foreach (i=1:3)  %do% {
+ # This creates one list with three dataframes, one for each species
+ShPathGenDistL100 <- foreach (i=1:3)  %do% {
 
  df1 <- ShPathGenDistL10[[i]]
 
@@ -205,9 +227,38 @@ elevDf t4 ON t1.rlyr=t4.rlyr AND t1.path_id=t4.path_id
 
 }
 
-str(ShPathGenDistL500)
-dim(ShPathGenDistL500[[3]])
-head(ShPathGenDistL500[[1]])
+class(ShPathGenDistL100)
+length(ShPathGenDistL100)
+
+str(ShPathGenDistL100)
+dim(ShPathGenDistL100[[2]])  #800; 968; 1352
+head(ShPathGenDistL100[[1]])
+
+
+#--------------------------------------------------
+# Turn object into a list to keep data structure
+
+rlabels <- c("wetland_1800", "wetland_1967", "wetland_1982", "wetland_2002","wetland2_1800","wetland2_1967","wetland2_1982","wetland2_2002")
+
+ShPathGenDistL500  <- foreach (i=1:length(ShPathGenDistL100)) %do% {
+                        
+                        foreach (j=1:length(rlabels)) %do% {
+         
+                                ShPathGenDistL100[[i]][ShPathGenDistL100[[i]]$rlyrlab==rlabels[j], ]
+         
+                                              }
+         
+         }
+
+class(ShPathGenDistL500)
+length(ShPathGenDistL500)
+
+str(ShPathGenDistL500[[1]])
+dim(ShPathGenDistL500[[3]][[1]])  #100; 121; 169
+head(ShPathGenDistL500[[1]][[1]])         
+
+
+saveRDS(ShPathGenDistL500, paste0(outf1,"ShPathGenDistL500_", suffix1, ".rds") )
 
 
 #=================================================
@@ -219,8 +270,14 @@ splabels <- c("sptu", "bltu", "sntu")
 
 foreach (i=1:length(splabels)) %do% {
 
-saveRDS(ShPathGenDistL500[[i]], paste0(outf2, "ShPathGenDistL500_", splabels[i], "_", suffix1, ".rds"))
+saveRDS(ShPathGenDistL500[[i]], paste0(outf1, "ShPathGenDistL500_", splabels[i], "_", suffix1, ".rds"))
          
          
          }
+
+test1 <- readRDS(paste0(outf1, "ShPathGenDistL500_", splabels[2], "_", suffix1, ".rds"))
+class(test1)
+length(test1)
+class(test1[[1]])
+dim(test1[[1]])
 

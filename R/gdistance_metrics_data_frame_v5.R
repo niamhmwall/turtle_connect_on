@@ -2,7 +2,7 @@
 # Create Gdistance Data Frame - Niamh's Turtle Project
 #=====================================================
 
-# 2023-12-14
+# 2024-03-15
 # Code authors: Niamh W. & Peter R.
 # P. James and MJ Fortin Labs
 
@@ -66,8 +66,8 @@ fpath2 <- "~/PhD/niamh/misc"
 #outf5 <- "~/PhD/niamh/output/version4/data/"  # For spatial data, X km, jenks
 #outf1 <- "~/PhD/niamh/output/version6/gis/"  # 
 #outf2 <- "~/PhD/niamh/output/version6/data/"  # 
-outf1 <- "~/PhD/niamh/output/version10/gis/"  # 
-outf2 <- "~/PhD/niamh/output/version10/data/"  # 
+#outf1 <- "~/PhD/niamh/output/version5/gis/"  # 
+outf1 <- "~/PhD/niamh/output/version11/data/"  # 
 
 
 # These prefix and suffixes are need to create files with the correct labels
@@ -101,8 +101,13 @@ rastfiles2 <- list.files(path=outf1, pattern = "wetland.*per_lc_1km.tif$", full.
 
 # Create a new raster stack to run gdistance.
 rWet <- rast(rastfiles2)
+rWet <- rast(rastfiles2[1])
 nlyr(rWet)
 
+
+# Use land raster as a null shortest path
+#rWet <- landr1
+#nlyr(rWet)
 
 #=====================================================================
 # Reclassify wetland raster using natural breaks (jenks, fisher-jenks)
@@ -243,9 +248,17 @@ rWet2 <- rWet^2 # version 10
 rWet2 <- ifel(is.na(rWet2), 0.01, rWet2)  # version 10
 #global(rWet2[[1]], fun="isNA")
 
+rWet2 <- ifel(rWet >= 0, 50, rWet)  # 50%
+rWet2 <- ifel(is.na(rWet2), 0.01, rWet2) 
+
+
+
 cost.All <- raster::stack(rWet2)  # Original raster stack (no jenks)
 #cost.All <- raster::stack(rWetRcl)  # Jenks reclassified raster stack
 
+# 2024-03-15: land raster 
+rWet2 <- rWet
+cost.All <- raster::stack(rWet2)  
 
 #-------------------------------------
 ### Create a transition layer
@@ -310,7 +323,7 @@ shPathLAll <- foreach (h=1:length(SpSitesL), .inorder=TRUE, .packages="foreach")
 #length(shPathLAll[[1]])   # 8
 # shPathLAll[[1]][[1]][[1]][[7]]
  saveRDS(shPathLAll, paste0(outf1,"shPathLAll.rds"))
-shPathLAll <- readRDS(paste0(outf1,"shPathLAll.rds"))
+#shPathLAll <- readRDS(paste0(outf1,"shPathLAll.rds"))
 
 
 #----------------------------------
@@ -324,6 +337,8 @@ as.matrix(terra::distance(vect(pts_pjL[[h]])) )
 
 
 rlabels <- c("wetland_1800", "wetland_1967", "wetland_1982", "wetland_2002","wetland2_1800","wetland2_1967","wetland2_1982","wetland2_2002")
+
+rlabels <- c("landr")
 
 
 #rm(shPathLAll2)
@@ -406,7 +421,7 @@ ShPathDf1 <- do.call("rbind", rbindL10)
 #saveRDS(ShPathDf1, paste0(outf5,"ShPathDf1_1km_jenks1.rds") )
 
 saveRDS(ShPathDf1, paste0(outf2, "ShPathDf1", suffix1, ".rds")  )
-
+#saveRDS(ShPathDf1, paste0(outf1, "ShPathDf1", suffix1, ".rds")  ) # landr raster
 
 
 

@@ -46,8 +46,8 @@ costDistLAll <- foreach (h=1:length(SpSitesL)) %do% {
          }
  
 class(costDistLAll)        
-costDistLAll[[1]][[8]]
-costDistLAll[[3]][[8]]
+#costDistLAll[[1]][[8]]
+#costDistLAll[[3]][[8]]
  
  
 
